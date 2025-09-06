@@ -1,4 +1,4 @@
-![CSG 3023 Intro to Game Programming ](imgs/CSG-3023-Logo.jpg)
+![CSG 3023 Intro to Game Programming ](imgs/CSG-3023-Logo.png)
 ## CSG 3023 Intro to Game Programming
 
 Introduction to the design, writing, testing, and documentation of 2D and 3D computer games. Major topics
