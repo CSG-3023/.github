@@ -401,27 +401,20 @@ Failing to unsubscribe can leave callbacks referencing destroyed Unity objects, 
 ---
 
 # 🧪 Scenario-Based Practice
+### Question 5
 
-## Question 5
+A `Door` object raises an event whenever it opens. Several other objects need to respond to the door opening, but the `Door` should not need references to those objects.
 
-A game uses:
+Which design best supports this requirement?
 
-```csharp
-public static event Action OnPlayerDied;
-```
-
-A UI script subscribes inside `Start()` but never unsubscribes. When the level reloads, the player dies and the game produces a `MissingReferenceException`.
-
-What caused the failure?
-
-**A.** Static events cannot invoke `void` methods.
-**B.** The destroyed UI instance remained registered in the static event's invocation list.
-**C.** `Action` requires generic parameters.
-**D.** `?.Invoke()` causes the error.
+* **A.** Give the `Door` a reference to every object that needs to respond.
+* **B.** Use an event that interested objects can subscribe to.
+* **C.** Have each object check the `Door` every frame.
+* **D.** Create a separate `Door` class for every object that responds.
 
 **Correct Answer: B**
 
-**Why:** Static events can persist beyond the lifetime of individual scene objects. Without `-=`, the previous subscriber can remain in the invocation list.
+**Why:** An event allows multiple objects to respond without the `Door` needing to know which objects are listening. This keeps the publisher and subscribers decoupled.
 
 ---
 
@@ -431,10 +424,10 @@ A countdown timer must trigger UI animation and audio when it reaches zero.
 
 Which design is most appropriate?
 
-**A.** Have `Timer.cs` directly reference UI and audio components.
-**B.** Declare `public event Action OnTimerCompleted;`, invoke it when the timer finishes, and allow UI/audio components to subscribe.
-**C.** Use `GameObject.Find()` every frame.
-**D.** Inherit from both UI and Audio classes.
+- **A.** Have `Timer.cs` directly reference UI and audio components.
+- **B.** Declare `public event Action OnTimerCompleted;`, invoke it when the timer finishes, and allow UI/audio components to subscribe.
+- **C.** Use `GameObject.Find()` every frame.
+- **D.** Inherit from both UI and Audio classes.
 
 **Correct Answer: B**
 
