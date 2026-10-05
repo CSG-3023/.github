@@ -528,7 +528,7 @@ FixedUpdate()
 
 # 🧪 Scenario-Based Practice
 
-##Question 7
+## Question 7
 
 A player should move at a consistent speed using a Dynamic Rigidbody. Which approach is correct?
 
