@@ -528,6 +528,40 @@ This makes the key distinction easy to remember: **Force and Impulse account for
 | **Example**          | —                                                                                                            | Temporarily parent a player to a moving platform: `other.transform.SetParent(transform);` |
 | **Leaving Trigger**  | —                                                                                                            | Remove the parent: `other.transform.SetParent(null);`                                     |
 
+---
+
+### 🏷️ Checking GameObject Tags
+
+Tags identify GameObjects by their **role or type** and can be checked during collision or trigger events.
+Yes—that would be more useful for the study guide because it connects the tag directly to the collision/trigger callbacks they are learning.
+
+### 🏷️ Checking GameObject Tags
+
+Tags identify GameObjects by their **role or type** and can be checked during collision or trigger events.
+
+```csharp
+private void OnTriggerEnter(Collider other)
+{
+    if (other.CompareTag("Player"))
+    {
+        // Player entered the trigger
+    }
+
+}//end OnTriggerEnter()
+```
+
+```csharp
+private void OnCollisionEnter(Collision collision)
+{
+    if (collision.gameObject.CompareTag("Player"))
+    {
+        // Player collided with the object
+    }
+
+}//end OnCollisonEnter()
+```
+
+> **Key Point:** `CompareTag()` is preferred for checking whether a GameObject has a specific tag.
 
 ---
 
