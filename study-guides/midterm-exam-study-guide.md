@@ -185,7 +185,7 @@ private void Awake()
 
 ---
 
-## 🎛️ Inspector Attributes
+### 🎛️ Inspector Attributes
 
 | Attribute           | Purpose                                                   |
 | ------------------- | --------------------------------------------------------- |
@@ -206,33 +206,25 @@ private void Awake()
 
 ---
 
-## 🔢 Magic Numbers & Magic Strings
+### 🛠️ Coding & Documentation Standards
 
-Hardcoded values make code more difficult to maintain and understand
 
-### ❌ Magic Number
-
-```csharp
-if (health <= 37)
-{
-    StopGame();
-}
-```
-
-### ✅ Named Constant
-
-```csharp
-private const int MINIMUM_HEALTH = 37;
-
-if (health <= MINIMUM_HEALTH)
-{
-    StopGame();
-}
-```
+| Area                       | Expectations                                                                                                                            |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Code Standards**         | Adhere to the course C# coding standards.                                                                                               |
+| **Code Structure**         | Each class and method should follow the Single Responsibility Principle and have one clear purpose.                                     |
+| **Magic Numbers**          | Avoid magic numbers. Define numeric values as named variables, properties, or constants when they represent a value or calculation.     |
+| **Script Template**        | Use the CSG script template for all new scripts.                                                                                        |
+| **Documentation Comments** | Every class must include a documentation comment describing its purpose. All fields and properties should be documented as appropriate. |
+| **Method Documentation**   | Every public method must include an XML documentation comment explaining its purpose and use.                                           |
+| **Inline Comments**        | Add comments to clarify non-obvious logic.                                                                                              |
+| **Naming Conventions**     | Follow the course C# naming conventions and asset naming guidelines.                                                                    |
+| **Component Design**       | Modular components should provide reusable functionality with a clear responsibility.                                                   |
+| **Behavioral Design**      | Behavioral classes should define game-specific functionality and coordinate components when appropriate.                                |
 
 ---
 
-## 🏷️ Naming Conventions
+### 🏷️ Naming Conventions
 
 | Element         | Convention          | Example                           |
 | --------------- | ------------------- | --------------------------------- |
@@ -265,6 +257,22 @@ namespace CSG.Physics
 ```
 
 **General structure:** `Company.Project.Category`
+
+---
+
+### 🔄 Unity Lifecycle
+
+Important lifecycle callbacks include:
+
+| Callback        | Purpose                                                            |
+| --------------- | ------------------------------------------------------------------ |
+| `Awake()`       | One-time initialization when the object is loaded.                 |
+| `OnEnable()`    | Runs when the component/GameObject becomes active.                 |
+| `Start()`       | One-time initialization before the first frame update, if enabled. |
+| `FixedUpdate()` | Fixed-timestep update used for physics calculations.               |
+| `Update()`      | Per-frame update used for input, timers, and non-physics behavior. |
+| `OnDisable()`   | Runs when the component/GameObject becomes inactive.               |
+| `OnDestroy()`   | Runs when the object is destroyed.                                 |
 
 ---
 
@@ -326,185 +334,27 @@ Which standard is violated?
 
 ---
 
-## Module 3: Decoupled Architecture & the Observer Pattern
+# Module 3: Spatial Transformations
 
-### 🧠 Observer Pattern Architecture
+### ⏱️ Frame Rate Independence
 
-The **Observer Pattern** establishes a **one-to-many relationship** between a publisher and its subscribers.
-
-* **Subject / Publisher** — broadcasts an event when something happens.
-* **Observers / Subscribers** — listen for the event and perform their own responses.
-* **Decoupling** — the publisher does not need to know which objects are listening or what they will do.
-
-```text
-             ┌─────────────────────────┐
-             │   YouTuber (Publisher)  │
-             │ Event: LiveStreamNotify │
-             └────────────┬────────────┘
-                          │
-                     Broadcast
-                          │
-          ┌───────────────┼───────────────┐
-          ▼               ▼               ▼
-    ┌──────────┐    ┌──────────┐    ┌──────────┐
-    │ Gregory  │    │ Samantha │    │ Valerie  │
-    │Subscriber│    │Subscriber│    │Subscriber│
-    └──────────┘    └──────────┘    └──────────┘
-```
-
----
-
-## 📡 C# Event Publishers
-
-The `event` keyword restricts event invocation to the class that declares the event.
-
-```csharp
-public class YouTuber : MonoBehaviour
-{
-    public static event Action LiveStreamNotification;
-
-    private void StartLiveStream()
-    {
-        LiveStreamNotification?.Invoke();
-    }
-}
-```
-
-#### ⚡ Null-Conditional Event Invocation
-
-Use `?.Invoke()` to safely invoke an event only when subscribers exist:
-
-```csharp
-OnTimerCompleted?.Invoke();
-```
-
----
-
-### 🔄 Event Subscribers
-
-Subscribe in `OnEnable()` and unsubscribe in `OnDisable()` so event listeners only remain registered while active.
-
-```csharp
-private void OnEnable()
-{
-    YouTuber.LiveStreamNotification += HandleEventResponse;
-}
-
-private void OnDisable()
-{
-    YouTuber.LiveStreamNotification -= HandleEventResponse;
-}
-```
-
-Failing to unsubscribe can leave callbacks referencing destroyed Unity objects, causing unnecessary references or `MissingReferenceException` errors.
-
----
-
-# 🧪 Scenario-Based Practice
-### Question 5
-
-A `Door` object raises an event whenever it opens. Several other objects need to respond to the door opening, but the `Door` should not need references to those objects.
-
-Which design best supports this requirement?
-
-* **A.** Give the `Door` a reference to every object that needs to respond.
-* **B.** Use an event that interested objects can subscribe to.
-* **C.** Have each object check the `Door` every frame.
-* **D.** Create a separate `Door` class for every object that responds.
-
-**Correct Answer: B**
-
-**Why:** An event allows multiple objects to respond without the `Door` needing to know which objects are listening. This keeps the publisher and subscribers decoupled.
-
----
-
-## Question 6
-
-A countdown timer must trigger UI animation and audio when it reaches zero.
-
-Which design is most appropriate?
-
-- **A.** Have `Timer.cs` directly reference UI and audio components.
-- **B.** Declare `public event Action OnTimerCompleted;`, invoke it when the timer finishes, and allow UI/audio components to subscribe.
-- **C.** Use `GameObject.Find()` every frame.
-- **D.** Inherit from both UI and Audio classes.
-
-**Correct Answer: B**
-
-**Why:** The timer broadcasts what happened without needing to know which systems respond to it.
-
----
-
-# Module 4: Unity Lifecycles & Spatial Transformations
-
-## 🔄 Unity Lifecycle
-
-Important lifecycle callbacks include:
-
-| Callback        | Purpose                                                            |
-| --------------- | ------------------------------------------------------------------ |
-| `Awake()`       | One-time initialization when the object is loaded.                 |
-| `OnEnable()`    | Runs when the component/GameObject becomes active.                 |
-| `Start()`       | One-time initialization before the first frame update, if enabled. |
-| `FixedUpdate()` | Fixed-timestep update used for physics calculations.               |
-| `Update()`      | Per-frame update used for input, timers, and non-physics behavior. |
-| `OnDisable()`   | Runs when the component/GameObject becomes inactive.               |
-| `OnDestroy()`   | Runs when the object is destroyed.                                 |
-
-A useful conceptual sequence is:
-
-```text
-Awake()
-   ↓
-OnEnable()
-   ↓
-Start()
-   ↓
-┌─────────────────────────────┐
-│ FixedUpdate()  → Physics    │
-│ Update()       → Frame      │
-│                             │
-│ Repeats while object runs   │
-└─────────────────────────────┘
-   ↓
-OnDisable()
-   ↓
-OnDestroy()
-```
-
-> **Important:** `FixedUpdate()` and `Update()` are recurring loops. They are not executed only once or in a simple one-after-another sequence.
-
----
-
-## ⏱️ Frame Rate Independence
-
-A computer's frame rate can change during gameplay.
-
-If movement occurs once per frame without considering elapsed time, the object's speed changes with FPS.
-
-### Displacement Equation
+Movement should account for elapsed time so speed remains consistent across different frame rates.
 
 ```text
 Displacement = Speed × Time.deltaTime × Direction
 ```
 
-Example:
-
 ```csharp
 transform.position += Speed * Time.deltaTime * Direction;
 ```
 
-At approximately 60 FPS:
-
-```text
-Time.deltaTime ≈ 0.0166 seconds
-```
+At 60 FPS, `Time.deltaTime ≈ 0.0166` seconds.
 
 ---
 
-## 📐 Vector Magnitude & Normalization
+### 📐 Vector Magnitude & Normalization
 
-### Magnitude
+#### Magnitude
 
 The length of a vector:
 
@@ -512,7 +362,7 @@ The length of a vector:
 Magnitude = √(x² + y² + z²)
 ```
 
-### Normalization
+#### Normalization
 
 `.normalized` creates a vector with a magnitude of **1** while preserving its direction.
 
@@ -526,137 +376,42 @@ A direction vector with a magnitude of 5 would otherwise cause movement to occur
 
 ---
 
-## ⚙️ Coordinate Spaces
+### ⚙️ Coordinate Spaces
 
-### World Space
+| Space           | Description                                                 | Unity         |
+| --------------- | ----------------------------------------------------------- | ------------- |
+| **World Space** | Global scene coordinates and axes.                          | `Space.World` |
+| **Local Space** | Coordinates relative to the object's orientation or parent. | `Space.Self`  |
 
-Global scene coordinates and axes.
-
-```csharp
-Space.World
-```
-
-### Local Space
-
-Coordinates relative to the object's own orientation or parent.
-
-```csharp
-Space.Self
-```
+---
 
 ### Common Transform Operations
 
-| Operation               | Space / Behavior                             |
-| ----------------------- | -------------------------------------------- |
-| `transform.position`    | World-space position                         |
-| `transform.Translate()` | Moves relative to specified coordinate space |
-| `Space.World`           | Global axes                                  |
-| `Space.Self`            | Local axes                                   |
+| Operation               | Type     | Space / Behavior                                                                                |
+| ----------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `transform.position`    | Property | Gets or sets the object's **world-space position**.                                             |
+| `transform.Translate()` | Method   | **Moves** the object using a specified coordinate space, such as `Space.World` or `Space.Self`. |
 
 ---
 
 ## 🔄 Euler Angles vs. Quaternions
 
-### Euler Angles
+| Representation   | Values       | Advantages                                                          | Considerations                  |
+| ---------------- | ------------ | ------------------------------------------------------------------- | ------------------------------- |
+| **Euler Angles** | `X, Y, Z`    | Human-readable; used in the Unity Inspector                         | Can experience **Gimbal Lock**  |
+| **Quaternions**  | `X, Y, Z, W` | Used internally by Unity; avoid the traditional gimbal-lock problem | Less intuitive to read directly |
 
-Three degree values:
-
-```text
-X, Y, Z
-```
-
-Advantages:
-
-* Human-readable
-* Used in the Unity Inspector
-
-Disadvantage:
-
-* Can experience **Gimbal Lock**
-
-### Quaternions
-
-Four values:
-
-```text
-X, Y, Z, W
-```
-
-Unity uses quaternions internally for object rotation.
+Convert Euler angles to a quaternion with:
 
 ```csharp
 Quaternion.Euler(x, y, z);
 ```
 
-Quaternions avoid the traditional gimbal-lock problem associated with Euler-angle representations.
-
----
-
-## 🧮 Native C++ Boundary
-
-Unity's C# API communicates with the underlying native engine.
-
-Some operations involving Unity objects can cross the managed/native boundary.
-
-> **Performance principle:** Avoid unnecessary repeated operations in high-frequency loops. Cache component and object references whenever appropriate.
-
----
-
-## ✅ Correct Pattern: Frame-Rate Independent Movement
-
-```csharp
-namespace CSG.Transform.Movement
-{
-    public class MoveTransform : MonoBehaviour
-    {
-        [SerializeField] private float _speed = 5f;
-        [SerializeField] private Vector3 _direction = Vector3.right;
-
-        public Vector3 Direction
-        {
-            get => _direction;
-            set => _direction = value.normalized;
-        }
-
-        private void Awake()
-        {
-            Direction = _direction;
-        }
-
-        private void Update()
-        {
-            transform.position += (_speed * Time.deltaTime) * Direction;
-        }
-    }
-}
-```
-
-## ❌ Anti-Pattern: Frame-Rate Dependent Movement
-
-```csharp
-public class BadMovement : MonoBehaviour
-{
-    public Vector3 direction = new Vector3(3, 0, 4);
-
-    void Update()
-    {
-        transform.position += direction * 10f;
-    }
-}
-```
-
-Problems:
-
-* No `Time.deltaTime`
-* Movement depends on frame rate
-* Direction has a magnitude of 5
-* Public field violates encapsulation
-
 ---
 
 # 🧪 Scenario-Based Practice
 
-## Question 7
+## Question 5
 
 A developer writes:
 
@@ -671,10 +426,10 @@ The object moves much farther per second on a 240 FPS computer than on a 30 FPS 
 
 What accounts for this behavior?
 
-**A.** Gimbal Lock
-**B.** Frame-rate-dependent movement caused by applying displacement once per frame without `Time.deltaTime`
-**C.** A missing kinematic Rigidbody
-**D.** A missing `Awake()` method
+- **A.** Gimbal Lock
+- **B.** Frame-rate-dependent movement caused by applying displacement once per frame without `Time.deltaTime`
+- **C.** A missing kinematic Rigidbody
+- **D.** A missing `Awake()` method
 
 **Correct Answer: B**
 
@@ -682,7 +437,7 @@ What accounts for this behavior?
 
 ---
 
-## Question 8
+## Question 6
 
 A turret calculates:
 
@@ -691,7 +446,6 @@ Vector3 targetDirection = target.position - transform.position;
 ```
 
 What should happen before using this vector for constant-speed movement?
-
 **A.** Multiply by `Time.fixedDeltaTime`.
 **B.** Convert it to Euler angles.
 **C.** Normalize the vector.
@@ -703,62 +457,32 @@ What should happen before using this vector for constant-speed movement?
 
 ---
 
-# Module 5: Unity Physics, Rigidbodies & Collision/Trigger Events
+## Module 4: Unity Physics
 
-## ⚙️ Rigidbody Body Types
+### ⚙️ Rigidbody Body Types
 
-| Type          | Configuration         | Driven By             | Common Uses                             |
-| ------------- | --------------------- | --------------------- | --------------------------------------- |
-| **Dynamic**   | `isKinematic = false` | PhysX simulation      | Player physics, debris, falling objects |
-| **Kinematic** | `isKinematic = true`  | Scripts / animation   | Moving platforms, elevators, doors      |
-| **Static**    | No Rigidbody          | Static scene geometry | Floors, walls, terrain                  |
+Yes. I’d fold the explanatory details into the **Common Behavior** column so the table stands on its own:
 
-### Dynamic Rigidbody
-
-Dynamic bodies respond to:
-
-* Gravity
-* Forces
-* Collisions
-* Torque
-
-### Kinematic Rigidbody
-
-Kinematic bodies are controlled by scripts or animation rather than forces.
-
-They can interact with Dynamic Rigidbodies.
-
-### Static Collider
-
-An object with a Collider but no Rigidbody is treated as static scene geometry.
+| Type          | Configuration         | Driven By             | Common Uses / Behavior                                                                                                            |
+| ------------- | --------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Dynamic**   | `isKinematic = false` | PhysX simulation      | Player physics, debris, falling objects. Responds to **gravity, forces, collisions, and torque**.                                 |
+| **Kinematic** | `isKinematic = true`  | Scripts / animation   | Moving platforms, elevators, doors. Controlled by scripts or animation rather than forces; can interact with Dynamic Rigidbodies. |
+| **Static**    | No Rigidbody          | Static scene geometry | Floors, walls, terrain. A Collider without a Rigidbody is treated as static scene geometry.                                       |
 
 ---
 
-## 🚚 Transform vs. Physics Movement
+### 🚚 Transform vs. Physics Movement
 
 ### Transform Movement
 
-```csharp
-transform.position = newPosition;
-```
+| Method                                  | Used With               | Description                                                                        | Typical Usage                         |
+| --------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------- | ------------------------------------- |
+| `transform.position = newPosition;`     | Any `Transform`         | Directly changes the object's position and can bypass physics calculations.        | General Transform-based movement      |
+| `_rigidBody.MovePosition(newPosition);` | **Kinematic Rigidbody** | Moves a Rigidbody through the physics system while maintaining Rigidbody behavior. | Typically called from `FixedUpdate()` |
 
-Directly changes position and can bypass physics calculations.
+> **Rule:** Avoid direct `Transform` movement on **Dynamic Rigidbodies**. Use Rigidbody-based movement instead.
 
-> **Rule:** Avoid using direct Transform movement on Dynamic Rigidbodies.
-
-### Rigidbody.MovePosition
-
-Used for moving Kinematic Rigidbodies:
-
-```csharp
-_rigidBody.MovePosition(newPosition);
-```
-
-Typically called from:
-
-```csharp
-FixedUpdate()
-```
+---
 
 ### Rigidbody.linearVelocity
 
@@ -1030,6 +754,115 @@ What was most likely omitted?
 **Correct Answer: B**
 
 **Why:** A standard Collider is solid by default. Setting `isTrigger = true` changes it into an overlap volume and allows `OnTriggerEnter()` to detect the interaction.
+
+---
+
+## Module 5: Events 
+
+### 🧠 Observer Pattern Architecture
+
+The **Observer Pattern** establishes a **one-to-many relationship** between a publisher and its subscribers.
+
+* **Subject / Publisher** — broadcasts an event when something happens.
+* **Observers / Subscribers** — listen for the event and perform their own responses.
+* **Decoupling** — the publisher does not need to know which objects are listening or what they will do.
+
+```text
+             ┌─────────────────────────┐
+             │   YouTuber (Publisher)  │
+             │ Event: LiveStreamNotify │
+             └────────────┬────────────┘
+                          │
+                     Broadcast
+                          │
+          ┌───────────────┼───────────────┐
+          ▼               ▼               ▼
+    ┌──────────┐    ┌──────────┐    ┌──────────┐
+    │ Gregory  │    │ Samantha │    │ Valerie  │
+    │Subscriber│    │Subscriber│    │Subscriber│
+    └──────────┘    └──────────┘    └──────────┘
+```
+
+---
+
+## 📡 C# Event Publishers
+
+The `event` keyword restricts event invocation to the class that declares the event.
+
+```csharp
+public class YouTuber : MonoBehaviour
+{
+    public static event Action LiveStreamNotification;
+
+    private void StartLiveStream()
+    {
+        LiveStreamNotification?.Invoke();
+    }
+}
+```
+
+#### ⚡ Null-Conditional Event Invocation
+
+Use `?.Invoke()` to safely invoke an event only when subscribers exist:
+
+```csharp
+OnTimerCompleted?.Invoke();
+```
+
+---
+
+### 🔄 Event Subscribers
+
+Subscribe in `OnEnable()` and unsubscribe in `OnDisable()` so event listeners only remain registered while active.
+
+```csharp
+private void OnEnable()
+{
+    YouTuber.LiveStreamNotification += HandleEventResponse;
+}
+
+private void OnDisable()
+{
+    YouTuber.LiveStreamNotification -= HandleEventResponse;
+}
+```
+
+Failing to unsubscribe can leave callbacks referencing destroyed Unity objects, causing unnecessary references or `MissingReferenceException` errors.
+
+---
+
+# 🧪 Scenario-Based Practice
+### Question 5
+
+A `Door` object raises an event whenever it opens. Several other objects need to respond to the door opening, but the `Door` should not need references to those objects.
+
+Which design best supports this requirement?
+
+* **A.** Give the `Door` a reference to every object that needs to respond.
+* **B.** Use an event that interested objects can subscribe to.
+* **C.** Have each object check the `Door` every frame.
+* **D.** Create a separate `Door` class for every object that responds.
+
+**Correct Answer: B**
+
+**Why:** An event allows multiple objects to respond without the `Door` needing to know which objects are listening. This keeps the publisher and subscribers decoupled.
+
+---
+
+## Question 6
+
+A countdown timer must trigger UI animation and audio when it reaches zero.
+
+Which design is most appropriate?
+
+- **A.** Have `Timer.cs` directly reference UI and audio components.
+- **B.** Declare `public event Action OnTimerCompleted;`, invoke it when the timer finishes, and allow UI/audio components to subscribe.
+- **C.** Use `GameObject.Find()` every frame.
+- **D.** Inherit from both UI and Audio classes.
+
+**Correct Answer: B**
+
+**Why:** The timer broadcasts what happened without needing to know which systems respond to it.
 
 ---
 
