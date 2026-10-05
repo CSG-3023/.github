@@ -124,12 +124,12 @@ What is the correct technical remedy?
 
 A programmer begins work on `feat/moving-platform`. Before writing new code, what sequence ensures the branch contains the latest changes from `main`?
 
-- **A.** `git push origin main` → `git checkout feat/moving-platform`
-- **B.** `git checkout main` → `git pull origin main` → `git checkout feat/moving-platform` → `git merge main`
+- **A.** `git checkout main` → `git pull origin main` → `git checkout feat/moving-platform` → `git merge main`
+- **B.** `git push origin main` → `git checkout feat/moving-platform`
 - **C.** `git commit -m "chore: sync"` → `git push origin feat/moving-platform`
 - **D.** `git checkout main` → `git add .` → `git commit -m "fix: merge"`
 
-**Correct Answer: B**
+**Correct Answer: A**
 
 **Why:** The local `main` branch must first be updated from the remote repository. Those changes are then merged into the active development branch.
 
@@ -324,11 +324,11 @@ public class PlayerHealth : MonoBehaviour
 
 Which standard is violated?
 - **A.** SRP, because the class derives from `MonoBehaviour`.
-- **B.** Encapsulation is violated by exposing `health` as a public field without controlled access or validation, and the naming convention is incorrect.
+- **B.** Static methods are used incorrectly.
 - **C.** YAGNI, because `TakeDamage()` accepts an integer parameter.
-- **D.** Static methods are used incorrectly.
+- **D.** Encapsulation is violated by exposing `health` as a public field without controlled access or validation, and the naming convention is incorrect.
 
-**Correct Answer: B**
+**Correct Answer: D**
 
 **Why:** External classes can directly modify `health` without going through the logic that manages damage and death.
 
@@ -446,10 +446,10 @@ Vector3 targetDirection = target.position - transform.position;
 ```
 
 What should happen before using this vector for constant-speed movement?
-**A.** Multiply by `Time.fixedDeltaTime`.
-**B.** Convert it to Euler angles.
-**C.** Normalize the vector.
-**D.** Pass it to `GetComponent<Rigidbody>()`.
+- **A.** Multiply by `Time.fixedDeltaTime`.
+- **B.** Convert it to Euler angles.
+- **C.** Normalize the vector.
+- **D.** Pass it to `GetComponent<Rigidbody>()`.
 
 **Correct Answer: C**
 
@@ -473,7 +473,13 @@ Yes. I’d fold the explanatory details into the **Common Behavior** column so t
 
 ### 🚚 Transform vs. Physics Movement
 
-### Transform Movement
+Physics force calculations belong in:
+
+```csharp
+FixedUpdate()
+```
+
+#### Transform Movement
 
 | Method                                  | Used With               | Description                                                                        | Typical Usage                         |
 | --------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------- | ------------------------------------- |
@@ -484,274 +490,70 @@ Yes. I’d fold the explanatory details into the **Common Behavior** column so t
 
 ---
 
-### Rigidbody.linearVelocity
+#### Rigidbody Velocity vs Force
 
-Directly sets physical velocity.
-
-```csharp
-_rigidBody.linearVelocity =
-    new Vector3(
-        moveX * _speed,
-        _rigidBody.linearVelocity.y,
-        moveZ * _speed
-    );
-```
-
-> **Important:** Do **not** multiply a direct velocity assignment by `Time.deltaTime`. Velocity is already measured in units per second.
-
-### Rigidbody.AddForce
-
-Applies force using a selected `ForceMode`.
-
-Common modes include:
-
-* `Force`
-* `Acceleration`
-* `Impulse`
-* `VelocityChange`
-
-Physics force calculations belong in:
-
-```csharp
-FixedUpdate()
-```
+| Method                     | Purpose                                    | Key Behavior                                                                          | Common Usage                            |
+| -------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------- |
+| `Rigidbody.linearVelocity` | Directly sets physical velocity.           | Sets velocity in **units per second**; do **not** multiply by `Time.deltaTime`.       | Direct, controlled movement             |
+| `Rigidbody.AddForce()`     | Applies a physical force to the Rigidbody. | Uses a selected `ForceMode`: `Force`, `Acceleration`, `Impulse`, or `VelocityChange`. | Physics-based acceleration and movement |
 
 ---
 
-# 💥 Collision vs. Trigger
+### 💥 Collision vs. Trigger
 
-```text
-                 Physics Event
-                      │
-                Is isTrigger?
-                 /          \
-               YES           NO
-                │             │
-             Trigger       Collision
-                │             │
-       OnTriggerEnter     OnCollisionEnter
-```
+| Feature              | **Collision**                                                                                                | **Trigger**                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| **Collider Setting** | `isTrigger = false`                                                                                          | `isTrigger = true`                                                                        |
+| **Behavior**         | Creates a **physical barrier** and participates in physical collision response.                              | Detects **overlap** without creating a physical barrier.                                  |
+| **Enter**            | `OnCollisionEnter(Collision collision)`                                                                      | `OnTriggerEnter(Collider other)`                                                          |
+| **Stay**             | `OnCollisionStay(Collision collision)`                                                                       | `OnTriggerStay(Collider other)`                                                           |
+| **Exit**             | `OnCollisionExit(Collision collision)`                                                                       | `OnTriggerExit(Collider other)`                                                           |
+| **Callback Data**    | `Collision` contains contact points, relative velocity, collision impulses, and other collision information. | Callback receives the overlapping `Collider`.                                             |
+| **Common Use**       | Physical interactions such as walls, floors, and objects colliding.                                          | Detection zones, pickups, hazards, and interaction areas.                                 |
+| **Example**          | —                                                                                                            | Temporarily parent a player to a moving platform: `other.transform.SetParent(transform);` |
+| **Leaving Trigger**  | —                                                                                                            | Remove the parent: `other.transform.SetParent(null);`                                     |
 
-## Collision
-
-A Collider with:
-
-```text
-isTrigger = false
-```
-
-acts as a physical barrier.
-
-Callbacks:
-
-```csharp
-OnCollisionEnter(Collision collision)
-OnCollisionStay(Collision collision)
-OnCollisionExit(Collision collision)
-```
-
-The `Collision` object contains information such as:
-
-* Contact points
-* Relative velocity
-* Collision impulses
 
 ---
 
-## Trigger
+### 🚀 Component Retrieval
 
-A Collider with:
-
-```text
-isTrigger = true
-```
-
-detects overlap without creating a physical barrier.
-
-Callbacks:
-
-```csharp
-OnTriggerEnter(Collider other)
-OnTriggerStay(Collider other)
-OnTriggerExit(Collider other)
-```
-
-The callback receives the overlapping `Collider`.
-
-### Common Use
-
-Triggers can detect when a player enters a moving platform's area and temporarily parent the player:
-
-```csharp
-other.transform.SetParent(transform);
-```
-
-When the player leaves:
-
-```csharp
-other.transform.SetParent(null);
-```
-
----
-
-## 🚀 Physics Performance
-
-### Cache Components
-
-Avoid repeatedly calling:
-
-```csharp
-GetComponent<Rigidbody>()
-```
-
-inside high-frequency loops.
-
-Instead:
-
-```csharp
-private Rigidbody _rigidBody;
-
-private void Awake()
-{
-    _rigidBody = GetComponent<Rigidbody>();
-}
-```
-
-Then reuse:
-
-```csharp
-_rigidBody
-```
-
-### TryGetComponent
-
-When retrieving a component from another object:
-
-```csharp
-if (other.TryGetComponent<Rigidbody>(out var rb))
-{
-    // Use rb
-}
-```
-
-### RequireComponent
-
-Declare required dependencies:
-
-```csharp
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(Collider))]
-```
-
-Unity will automatically add the required components when appropriate.
-
----
-
-## ✅ Correct Pattern: Kinematic Moving Platform
-
-```csharp
-namespace CSG.Physics
-{
-    [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(Collider))]
-    public class MovingPlatform : MonoBehaviour
-    {
-        private Rigidbody _rigidBody;
-
-        private void Awake()
-        {
-            _rigidBody = GetComponent<Rigidbody>();
-            _rigidBody.isKinematic = true;
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                other.transform.SetParent(transform);
-            }
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                other.transform.SetParent(null);
-            }
-        }
-    }
-}
-```
-
-## ❌ Anti-Pattern: Uncached Physics & Incorrect Velocity
-
-```csharp
-public class BadPhysicsPlayer : MonoBehaviour
-{
-    public float speed = 5f;
-
-    void FixedUpdate()
-    {
-        Rigidbody rb = GetComponent<Rigidbody>();
-
-        rb.linearVelocity = new Vector3(
-            1 * speed * Time.deltaTime,
-            rb.linearVelocity.y,
-            0
-        );
-    }
-}
-```
-
-Problems:
-
-* `GetComponent()` is repeatedly called
-* `linearVelocity` is incorrectly multiplied by `Time.deltaTime`
-* Public field violates encapsulation
+| Approach                 | Purpose                                             | Example                                                     | Key Guidance                                                                                                                  |
+| ------------------------ | --------------------------------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **`[RequireComponent]`** | Declare components that a script **requires**.      | `[RequireComponent(typeof(Rigidbody))]`                     | Unity automatically adds the required component when the script is added to a GameObject. Helps prevent missing dependencies. |
+| **Cache Component**      | Store a component reference for repeated use.       | `_rigidBody = GetComponent<Rigidbody>();`                   | Retrieve once, typically in `Awake()`, then reuse the cached reference.                                                       |
+| **`TryGetComponent`**    | Safely retrieve a component that **may not exist**. | `if (other.TryGetComponent<Rigidbody>(out var rb)) { ... }` | Useful for components on **other objects** when the dependency is optional or uncertain.                                      |
 
 ---
 
 # 🧪 Scenario-Based Practice
 
-## Question 9
+##Question 7
 
-A Dynamic player uses:
+A player should move at a consistent speed using a Dynamic Rigidbody. Which approach is correct?
 
-```csharp
-_rigidBody.linearVelocity = new Vector3(
-    _moveInput * _speed * Time.deltaTime,
-    _rigidBody.linearVelocity.y,
-    0f
-);
-```
+- **A.** Set linearVelocity to the desired movement speed.
+- **B.** Set linearVelocity to the desired movement speed multiplied by Time.deltaTime.
+- **C.** Set linearVelocity to the desired movement speed multiplied by the frame rate.
+- **D.** Use transform.position so the Rigidbody moves independently of physics.
 
-The player moves extremely slowly.
+**Correct Answer: A**
 
-What is wrong?
-
-**A.** `linearVelocity` must only be assigned in `Awake()`.
-**B.** Velocity was multiplied by `Time.deltaTime`.
-**C.** Dynamic Rigidbodies cannot retain vertical velocity.
-**D.** Local variables require `[SerializeField]`.
-
-**Correct Answer: B**
-
-**Why:** Velocity is already expressed as a rate per second. Multiplying it by `Time.deltaTime` unnecessarily reduces the intended velocity.
+**Why:** linearVelocity represents a rate of movement in units per second, so the desired velocity should be assigned directly. Time.deltaTime is used when calculating frame-based displacement, not when directly assigning velocity.
 
 ---
 
-## Question 10
+## Question 8
 
 A collectible should disappear and award points when the player walks through it. Instead, the player hits the collectible as though it were a solid wall.
 
 What was most likely omitted?
+- **A.** The player's Rigidbody was made Kinematic.
+- **B.** `OnCollisionEnter` was used instead of `OnDisable`.
+- **C.** The script did not derive from `CSG.Physics`.
+- **D.** The collectible's Collider did not have `isTrigger` enabled.
 
-**A.** The player's Rigidbody was made Kinematic.
-**B.** The collectible's Collider did not have `isTrigger` enabled.
-**C.** The script did not derive from `CSG.Physics`.
-**D.** `OnCollisionEnter` was used instead of `OnDisable`.
-
-**Correct Answer: B**
+**Correct Answer: D**
 
 **Why:** A standard Collider is solid by default. Setting `isTrigger = true` changes it into an overlap volume and allows `OnTriggerEnter()` to detect the interaction.
 
@@ -832,24 +634,24 @@ Failing to unsubscribe can leave callbacks referencing destroyed Unity objects, 
 ---
 
 # 🧪 Scenario-Based Practice
-### Question 5
+### Question 9
 
 A `Door` object raises an event whenever it opens. Several other objects need to respond to the door opening, but the `Door` should not need references to those objects.
 
 Which design best supports this requirement?
 
 * **A.** Give the `Door` a reference to every object that needs to respond.
-* **B.** Use an event that interested objects can subscribe to.
-* **C.** Have each object check the `Door` every frame.
+* **B.** Have each object check the `Door` every frame.
+* **C.**  Use an event that interested objects can subscribe to.
 * **D.** Create a separate `Door` class for every object that responds.
 
-**Correct Answer: B**
+**Correct Answer: C**
 
 **Why:** An event allows multiple objects to respond without the `Door` needing to know which objects are listening. This keeps the publisher and subscribers decoupled.
 
 ---
 
-## Question 6
+## Question 10
 
 A countdown timer must trigger UI animation and audio when it reaches zero.
 
