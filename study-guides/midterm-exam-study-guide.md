@@ -490,12 +490,27 @@ FixedUpdate()
 
 ---
 
-#### Rigidbody Velocity vs Force
+### Rigidbody Velocity vs Force
 
 | Method                     | Purpose                                    | Key Behavior                                                                          | Common Usage                            |
 | -------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------- | --------------------------------------- |
 | `Rigidbody.linearVelocity` | Directly sets physical velocity.           | Sets velocity in **units per second**; do **not** multiply by `Time.deltaTime`.       | Direct, controlled movement             |
 | `Rigidbody.AddForce()`     | Applies a physical force to the Rigidbody. | Uses a selected `ForceMode`: `Force`, `Acceleration`, `Impulse`, or `VelocityChange`. | Physics-based acceleration and movement |
+
+---
+
+#### ⚡ Force Modes
+The mode used to apply force to the Rigidbody
+
+| Force Mode           | Applies      | Depends On Mass? | Depends On Time? | Description                                                                                                                      |
+| -------------------- | ------------ | ---------------: | ---------------: | -------------------------------------------------------------------------------------------------------------------------------- |
+| **`Force`**          | Force        |          **Yes** |          **Yes** | Applies a continuous force that produces acceleration based on the Rigidbody's mass and the amount of time the force is applied. |
+| **`Acceleration`**   | Acceleration |           **No** |          **Yes** | Applies acceleration directly, independent of the Rigidbody's mass.                                                              |
+| **`Impulse`**        | Sudden force |          **Yes** |           **No** | Applies a sudden change in momentum, such as a jump or explosion.                                                                |
+| **`VelocityChange`** | Velocity     |           **No** |           **No** | Directly changes the Rigidbody's velocity, independent of mass and time.                                                         |
+
+This makes the key distinction easy to remember: **Force and Impulse account for mass; Force and Acceleration account for time; VelocityChange accounts for neither.**
+
 
 ---
 
