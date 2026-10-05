@@ -1,23 +1,6 @@
-# 🎮 Intro to Unity Game Programming
+# CSG 3023 - Midterm Exam Study Guide
 
-## Midterm Exam Study Guide
-
-This study guide is designed to prepare students for the **Intro to Unity Game Programming midterm examination**.
-
-The exam evaluates higher-cognitive skills including:
-
-* **Application** — applying programming and Unity concepts to new situations
-* **Code Analysis** — identifying errors, inefficiencies, and architectural problems
-* **Architectural Decision-Making** — selecting appropriate programming patterns and structures
-* **Scenario-Based Problem Solving** — diagnosing and resolving realistic development problems
-
-The exam covers **five core domain modules**.
-
----
-
-# Module 1: Version Control Systems & Git Workflow
-
-## 🧠 Conceptual Breakdown
+## Module 1: Version Control Systems & Git Workflow
 
 ### Git vs. GitHub vs. GitHub Desktop
 
@@ -46,7 +29,7 @@ Large binary file extensions are configured in the:
 
 ---
 
-## 🌿 Branching Taxonomy
+### 🌿 Branching Taxonomy
 
 A **branch** represents an independent line of development. Branches isolate unverified work from the stable `main` codebase.
 
@@ -62,57 +45,15 @@ A **branch** represents an independent line of development. Branches isolate unv
 ---
 
 ## 🔄 Git Lifecycle Stages
+`Working Directory → Staging Area → Local Repository → Remote Repository → Pull Request → Merge`
+| Stage                    | What It Means                                                                                                                                   | Common Command                              |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| **1. Working Directory** | The project files currently stored on the local computer, including uncommitted changes.                                                        | —                                           |
+| **2. Staging Area**      | The group of modifications selected to be included in the next commit.                                                                          | `git add .`                                 |
+| **3. Local Repository**  | A recorded snapshot of the staged changes stored in the local repository.                                                                       | `git commit -m "feat: add player movement"` |
+| **4. Remote Repository** | Uploads local commits to the corresponding branch on the remote repository, such as GitHub.                                                     | `git push origin <branch-name>`             |
+| **5. Pull Request**      | A GitHub feature used to review, discuss, approve, and merge changes from one branch into another, typically from a feature branch into `main`. | —                                           |
 
-Changes move through several stages:
-
-```text
-Working Directory
-       │
-       │ git add
-       ▼
-Staging Area
-       │
-       │ git commit
-       ▼
-Local Repository
-       │
-       │ git push
-       ▼
-Remote Repository
-(GitHub)
-```
-
-### 1. Working Directory
-
-The project files currently stored on the local computer, including uncommitted changes.
-
-### 2. Staging Area
-
-The group of modifications selected to be included in the next commit.
-
-```bash
-git add .
-```
-
-### 3. Commit
-
-A recorded snapshot of the staged changes stored in the local repository.
-
-```bash
-git commit -m "feat: add player movement"
-```
-
-### 4. Push
-
-Uploads local commits to the corresponding branch on the remote repository.
-
-```bash
-git push origin <branch-name>
-```
-
-### 5. Pull Request
-
-A GitHub feature used to review, discuss, approve, and merge changes from one branch into another, typically from a feature branch into `main`.
 
 ---
 
@@ -143,27 +84,11 @@ Good commit points include:
 
 A reasonable guideline during active development is approximately **one commit per hour**.
 
-> ⚠️ **Anti-Pattern:** Do not commit every few seconds, but also do not wait until an entire multi-system project is finished before making a single commit.
-
-### Session End
-
-Push the working branch to the remote repository:
-
-```bash
-git push origin <branch-name>
-```
-
-> ⚠️ **Never push unreviewed development work directly to `main`.**
-
 ---
 
-## 📝 Standardized Commit Messages
+### 📝 Standardized Commit Messages
 
-Use the format:
-
-```text
-type: description
-```
+Use the format: `type: description`
 
 | Type        | Purpose                                               | Example                                   |
 | ----------- | ----------------------------------------------------- | ----------------------------------------- |
@@ -176,86 +101,6 @@ type: description
 
 ---
 
-## ✅ Workflow Pattern vs. ❌ Anti-Pattern
-
-### ✅ Safe Feature Integration
-
-```bash
-git checkout -b feat/coin-pickup
-
-# Work on coin pickup...
-
-git add .
-git commit -m "feat: implement coin collection collision logic"
-git push origin feat/coin-pickup
-
-# Open a Pull Request on GitHub
-# Review and merge into main
-```
-
-### ❌ Direct Main Branch Development
-
-```bash
-git checkout main
-
-# Add large binary assets...
-
-git add .
-git commit -m "added whole game"
-git push origin main
-```
-
-**Why this is problematic:**
-
-* Bypasses branch isolation
-* Bypasses code review
-* Risks destabilizing `main`
-* Can create repository bloat when large binaries are not managed with Git LFS
-
----
-
-## 🎮 Unity + Version Control Rules
-
-### Repository Location
-
-Clone or initialize repositories in clean, predictable locations.
-
-Example:
-
-```text
-D:\Students\YourName
-```
-
-Avoid deeply nested paths, unnecessary spaces, or dynamically synchronized folders.
-
-### Folder and Namespace Mirroring
-
-Project folders should mirror C# namespaces.
-
-Example:
-
-```text
-Assets/
-└── Scripts/
-    └── GCT/
-        └── Physics/
-            └── MoveRigidbodyPosition.cs
-```
-
-```csharp
-namespace GCT.Physics
-{
-    public class MoveRigidbodyPosition : MonoBehaviour
-    {
-        // ...
-    }
-}
-```
-
-This improves project organization and makes files easier to locate.
-
----
-
 # 🧪 Scenario-Based Practice
 
 ## Question 1
@@ -264,10 +109,10 @@ A developer imports 4K textures and high-poly 3D character models totaling 1.5 G
 
 What is the correct technical remedy?
 
-**A.** Merge the feature branch into `main` locally, then push directly to GitHub.
-**B.** Delete the local `.git` folder and reinitialize the repository using `git init`.
-**C.** Install Git LFS, track the binary extensions, and register them in `.gitattributes`.
-**D.** Convert private fields to public variables so Git can compress them.
+- **A.** Merge the feature branch into `main` locally, then push directly to GitHub.
+- **B.** Delete the local `.git` folder and reinitialize the repository using `git init`.
+- **C.** Install Git LFS, track the binary extensions, and register them in `.gitattributes`.
+- **D.** Convert private fields to public variables so Git can compress them.
 
 **Correct Answer: C**
 
@@ -279,10 +124,10 @@ What is the correct technical remedy?
 
 A programmer begins work on `feat/moving-platform`. Before writing new code, what sequence ensures the branch contains the latest changes from `main`?
 
-**A.** `git push origin main` → `git checkout feat/moving-platform`
-**B.** `git checkout main` → `git pull origin main` → `git checkout feat/moving-platform` → `git merge main`
-**C.** `git commit -m "chore: sync"` → `git push origin feat/moving-platform`
-**D.** `git checkout main` → `git add .` → `git commit -m "fix: merge"`
+- **A.** `git push origin main` → `git checkout feat/moving-platform`
+- **B.** `git checkout main` → `git pull origin main` → `git checkout feat/moving-platform` → `git merge main`
+- **C.** `git commit -m "chore: sync"` → `git push origin feat/moving-platform`
+- **D.** `git checkout main` → `git add .` → `git commit -m "fix: merge"`
 
 **Correct Answer: B**
 
@@ -290,9 +135,7 @@ A programmer begins work on `feat/moving-platform`. Before writing new code, wha
 
 ---
 
-# Module 2: C# Scripting Standards & Object-Oriented Principles
-
-## 🧠 Conceptual Breakdown
+# Module 2: C# Fundametals
 
 ### Encapsulation & Access Modifiers
 
@@ -306,27 +149,8 @@ A programmer begins work on `feat/moving-platform`. Before writing new code, wha
 
 ### Fields vs. Properties
 
-Fields store internal data and should generally remain `private`.
-
-```csharp
-private float _speed;
-```
-
-Properties provide controlled access:
-
-```csharp
-public float Speed
-{
-    get => _speed;
-    set => _speed = Mathf.Clamp(value, 0f, MAX_SPEED);
-}
-```
-
----
-
-## 🛡️ Property Validation
-
-Properties can execute logic when a value is assigned.
+Fields store internal data and **should generally remain `private`**.
+Properties provide **controlled access** and **validate** by excuting logic when a value is assigned.
 
 ```csharp
 private float _speed;
@@ -372,37 +196,19 @@ private void Awake()
 
 ---
 
-## 🧩 Core Software Design Principles
-
-### SRP — Single Responsibility Principle
-
-A class should have one primary responsibility.
-
-For example:
-
-* Movement component → movement
-* Health component → health
-* Audio component → audio
-
-### DRY — Don't Repeat Yourself
-
-Avoid unnecessary duplication by centralizing shared logic.
-
-> **Architectural Trade-Off:** Small amounts of duplication can sometimes be preferable when independence, readability, and self-containment are more important than creating an abstraction.
-
-### KISS — Keep It Simple
-
-Prefer simple, readable solutions over unnecessary complexity.
-
-### YAGNI — You Aren't Gonna Need It
-
-Implement what is currently required rather than speculative features.
+### 🧩 Core Software Design Principles
+| Principle                                 | Meaning                                                                | Example / Guidance                                                                                                                                                                          |
+| ----------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SRP — Single Responsibility Principle** | A class should have one primary responsibility.                        | **Movement component** → movement<br>**Health component** → health<br>**Audio component** → audio                                                                                           |
+| **DRY — Don't Repeat Yourself**           | Avoid unnecessary duplication by centralizing shared logic.            | **Architectural Trade-Off:** Small amounts of duplication can sometimes be preferable when independence, readability, and self-containment are more important than creating an abstraction. |
+| **KISS — Keep It Simple**                 | Prefer simple, readable solutions over unnecessary complexity.         | Avoid adding abstractions, patterns, or systems that are not needed to solve the current problem.                                                                                           |
+| **YAGNI — You Aren't Gonna Need It**      | Implement what is currently required rather than speculative features. | Don't build features or infrastructure based only on what *might* be needed later.                                                                                                          |
 
 ---
 
 ## 🔢 Magic Numbers & Magic Strings
 
-Hardcoded values make code more difficult to maintain.
+Hardcoded values make code more difficult to maintain and understand
 
 ### ❌ Magic Number
 
@@ -442,21 +248,14 @@ if (health <= MINIMUM_HEALTH)
 | Boolean values  | Question/state form | `_isMoving`, `_hasKey`, `CanJump` |
 
 ---
+### 📁 Namespace Taxonomy
 
-## 📁 Namespace Taxonomy
-
-Namespaces organize code and prevent naming collisions.
-
-General structure:
+Namespaces organize code and should **mirror the folder structure**.
 
 ```text
-Company.Project.Category
-```
-
-Example:
-
-```csharp
-namespace GCT.Physics
+Assets/Scripts/CSG/Physics/MoveRigidbodyPosition.cs
+        ↓
+namespace CSG.Physics
 {
     public class MoveRigidbodyPosition : MonoBehaviour
     {
@@ -465,68 +264,7 @@ namespace GCT.Physics
 }
 ```
 
-Namespaces should mirror the folder structure:
-
-```text
-Assets/Scripts/GCT/Physics/
-```
-
----
-
-## ✅ Correct Pattern: Encapsulated Serialized Field
-
-```csharp
-namespace CSG.Transform.Movement
-{
-    public class MoveTransform : MonoBehaviour
-    {
-        private const float MAX_SPEED = 20f;
-
-        [Header("Movement Settings")]
-        [SerializeField]
-        [Tooltip("Object movement speed in units per second.")]
-        [Range(0f, MAX_SPEED)]
-        private float _speed = 5f;
-
-        public float Speed
-        {
-            get => _speed;
-            set => _speed = Mathf.Clamp(value, 0f, MAX_SPEED);
-        }
-
-        private void Awake()
-        {
-            Speed = _speed;
-        }
-    }
-}
-```
-
-## ❌ Anti-Pattern: Public Fields & Magic Numbers
-
-```csharp
-public class Movement : MonoBehaviour
-{
-    public float speed = 500f;
-
-    void Update()
-    {
-        if (speed > 200)
-        {
-            transform.position += new Vector3(1, 0, 0) * speed;
-        }
-    }
-}
-```
-
-Problems include:
-
-* Public field exposes internal state
-* No validation
-* Magic number `200`
-* Missing `Time.deltaTime`
-* Missing namespace
-* Naming does not follow the established convention
+**General structure:** `Company.Project.Category`
 
 ---
 
