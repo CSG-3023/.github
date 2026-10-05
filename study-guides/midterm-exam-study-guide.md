@@ -282,10 +282,10 @@ and a property setter using `Mathf.Clamp()`. However, the object still moves at 
 
 What caused the failure?
 
-**A.** `[SerializeField]` permanently overrides property setters.
-**B.** Unity's Inspector assigned `999f` directly to `_speed`, bypassing the property setter because `Awake()` did not execute `Speed = _speed;`.
-**C.** The property uses `PascalCase`.
-**D.** Floating-point values cannot be clamped in a `MonoBehaviour`.
+- **A.** `[SerializeField]` permanently overrides property setters.
+- **B.** Unity's Inspector assigned `999f` directly to `_speed`, bypassing the property setter because `Awake()` did not execute `Speed = _speed;`.
+- **C.** The property uses `PascalCase`.
+- **D.** Floating-point values cannot be clamped in a `MonoBehaviour`.
 
 **Correct Answer: B**
 
@@ -315,11 +315,10 @@ public class PlayerHealth : MonoBehaviour
 ```
 
 Which standard is violated?
-
-**A.** SRP, because the class derives from `MonoBehaviour`.
-**B.** Encapsulation is violated by exposing `health` as a public field without controlled access or validation, and the naming convention is incorrect.
-**C.** YAGNI, because `TakeDamage()` accepts an integer parameter.
-**D.** Static methods are used incorrectly.
+- **A.** SRP, because the class derives from `MonoBehaviour`.
+- **B.** Encapsulation is violated by exposing `health` as a public field without controlled access or validation, and the naming convention is incorrect.
+- **C.** YAGNI, because `TakeDamage()` accepts an integer parameter.
+- **D.** Static methods are used incorrectly.
 
 **Correct Answer: B**
 
@@ -327,9 +326,9 @@ Which standard is violated?
 
 ---
 
-# Module 3: Decoupled Architecture & the Observer Pattern
+## Module 3: Decoupled Architecture & the Observer Pattern
 
-## 🧠 Observer Pattern Architecture
+### 🧠 Observer Pattern Architecture
 
 The **Observer Pattern** establishes a **one-to-many relationship** between a publisher and its subscribers.
 
@@ -355,12 +354,7 @@ The **Observer Pattern** establishes a **one-to-many relationship** between a pu
 
 ---
 
-## 📡 C# Events & Delegates
-
-`System.Action` represents a method that:
-
-* Returns `void`
-* Takes no parameters
+## 📡 C# Event Publishers
 
 The `event` keyword restricts event invocation to the class that declares the event.
 
@@ -376,133 +370,33 @@ public class YouTuber : MonoBehaviour
 }
 ```
 
+#### ⚡ Null-Conditional Event Invocation
+
+Use `?.Invoke()` to safely invoke an event only when subscribers exist:
+
+```csharp
+OnTimerCompleted?.Invoke();
+```
+
 ---
 
-## 🔄 Event Lifecycle Management
+### 🔄 Event Subscribers
 
-Subscribers should register and unregister with the event according to their active lifecycle.
-
-### Subscribe
+Subscribe in `OnEnable()` and unsubscribe in `OnDisable()` so event listeners only remain registered while active.
 
 ```csharp
 private void OnEnable()
 {
     YouTuber.LiveStreamNotification += HandleEventResponse;
 }
-```
 
-### Unsubscribe
-
-```csharp
 private void OnDisable()
 {
     YouTuber.LiveStreamNotification -= HandleEventResponse;
 }
 ```
 
-### Why?
-
-If a subscriber remains registered after its GameObject is destroyed, the publisher can retain a reference to the subscriber's callback.
-
-This can result in:
-
-* Memory remaining referenced unnecessarily
-* Callbacks targeting destroyed Unity objects
-* `MissingReferenceException` errors
-
----
-
-## ⚡ Null-Conditional Event Invocation
-
-Use:
-
-```csharp
-OnTimerCompleted?.Invoke();
-```
-
-The `?.` operator ensures the event is invoked only when there are subscribers.
-
----
-
-## ✅ Correct Pattern: Decoupled Observer
-
-### Publisher
-
-```csharp
-namespace CSG.Behaviours
-{
-    public class Coin : MonoBehaviour
-    {
-        public event Action OnCollected;
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.CompareTag("Player"))
-            {
-                OnCollected?.Invoke();
-                Destroy(gameObject);
-            }
-        }
-    }
-}
-```
-
-### Subscriber
-
-```csharp
-namespace CSG.Behaviours
-{
-    public class ScoreTracker : MonoBehaviour
-    {
-        [SerializeField] private Coin _targetCoin;
-
-        private void OnEnable()
-        {
-            if (_targetCoin != null)
-            {
-                _targetCoin.OnCollected += AddScore;
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (_targetCoin != null)
-            {
-                _targetCoin.OnCollected -= AddScore;
-            }
-        }
-
-        private void AddScore()
-        {
-            Debug.Log("Score incremented!");
-        }
-    }
-}
-```
-
----
-
-## ❌ Anti-Pattern: Hard-Coupled Direct Calls
-
-```csharp
-public class BadCoin : MonoBehaviour
-{
-    public UIManager uiManager;
-    public ScoreManager scoreManager;
-
-    private void OnTriggerEnter(Collider other)
-    {
-        uiManager.UpdateCoinUI();
-        scoreManager.AddCoin();
-
-        Destroy(gameObject);
-    }
-}
-```
-
-**Problem:** `BadCoin` directly depends on both `UIManager` and `ScoreManager`.
-
-The coin cannot function independently of those systems.
+Failing to unsubscribe can leave callbacks referencing destroyed Unity objects, causing unnecessary references or `MissingReferenceException` errors.
 
 ---
 
