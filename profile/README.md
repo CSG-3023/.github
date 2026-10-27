@@ -5,4 +5,4 @@ Introduction to the design, writing, testing, and documentation of 2D and 3D com
 
 *Prerequisite: CS 2003 Fundamentals of Algorithms*
 
-[See Syllabus](https://sites.utulsa.edu/csg/csg-courses/csg-3023-intro-to-game-programming/)
+**[See Syllabus](https://sites.utulsa.edu/csg/csg-courses/csg-3023-intro-to-game-programming/)**
